@@ -27,6 +27,40 @@
 #     [10, 2, 0, 4, 11, 15, 17, 5, 18]
 ###############################################################################
 
+# def pivot(a, start, end):
+#    pivot = a[start]
+#    for i in range(start + 1, end):
+#        x = a[i]
+#        if x < pivot:
+#            a[start] = x
+#            a[i] = pivot
+#        else:
+#            for j in range(end, i):
+#                y = a[j]
+#                if y < pivot:
+#                    a[j] = pivot
+#                    a[i] = y
+#                else:
+
+
+def pivot(table, start, end):
+    # a = table[start: end+1]
+    left_i = start + 1 #start + 0
+    right_i = end #start + end
+    pivot = table[start]
+    while left_i < right_i:
+        if table[left_i] < pivot:
+            left_i += 1
+        elif table[right_i] >= pivot:
+            right_i -= 1
+        else:
+            table[left_i], table[right_i] = table[right_i], table[left_i]
+    
+    table[start] = table[right_i]
+    table[right_i] = pivot
+    return right_i
+
+            
 
 
 ###############################################################################
@@ -43,8 +77,16 @@
 # element po velikosti. Funkcija sme spremeniti tabelo [a]. Cilj naloge je, da
 # jo rešite brez da v celoti uredite tabelo [a].
 ###############################################################################
-
-
+def kth_element(table, k, start=0, end=None):
+    if end is None:
+        end = len(table) - 1
+    i = pivot(table, start, end)
+    if i == k:
+        return table[i]
+    elif i > k:
+        return kth_element(table, k, start, i - 1)
+    else:
+        return kth_element(table, k - i, i + 1, end)
 
 ###############################################################################
 # Tabelo a želimo urediti z algoritmom hitrega urejanja (quicksort).
@@ -59,6 +101,20 @@
 #     >>> quicksort(a)
 #     [2, 3, 4, 5, 10, 11, 15, 17, 18]
 ###############################################################################
+def quicksort(a, start=0, end=None):
+    if end is None:
+        end = len(a) - 1
+    if start >= end:
+        return
+    else:
+        i = pivot(a, start, end)
+        quicksort(a, start, i-1)
+        quicksort(a, i+1, end)
+
+
+        # qs1 = q(lower)
+        # qs2 = q(upper)
+        # qs1 @ [x] @ qs2
 
 
 
@@ -84,8 +140,28 @@
 #     [1,1,2,3,3,4,5,5,6,7,7,10]
 #
 ###############################################################################
+def zlij(target, start, end, list_1, list_2):
+    i1 = 0
+    i2 = 0
+    while i1 < len(list_1) and i2 < len(list_2):
+        if list[i1] <= list2[i2]:
+            target[start + i1 + i2] = list_1[i1]
+            i1 += 1
+        else:
+            target[start + i1 + i2] = list_2[i2]
+            i2 += 1
+    while i1 < len(list_1):
+        target[start + i1 + i2] = list_1[i1]
+        i1 += 1
+    while i2 < len(list_2):
+        target[start + i1 + i2] = list_1[i2]
+        i2 += 1
 
+#sortirni algoritem je stabilen, če enaki stvari pusti pri miru; mergesort je, če je merge, quicksort pa ne
+#vse delaj z INDEKSI, so praktično zastonj
 
+#V ocamlu bi dal pa inf na konc Num = NumI Int
+#                                    | Inf 
 
 ###############################################################################
 # Tabelo želimo urediti z zlivanjem (merge sort). 
@@ -102,3 +178,10 @@
 # >>> mergesort(a)
 # [2, 3, 4, 5, 10, 11, 15, 17, 18]
 ###############################################################################
+
+
+def mergesort(a):
+    n = len(a) // 2
+    a1 = a[0:n]
+    a2 = a[n:len(a)]
+    zlij(a, 0, len(a), mergesort(a1), mergesort(a2))
