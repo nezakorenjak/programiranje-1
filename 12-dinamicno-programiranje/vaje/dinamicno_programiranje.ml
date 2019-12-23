@@ -16,10 +16,40 @@
  - : int = 13
 [*----------------------------------------------------------------------------*)
 
+(*a.(x).(y) <- x*) (*D.N. spiši v pythonu, na izpitu se to sme. *)
+
 let test_matrix = 
   [| [| 1 ; 2 ; 0 |];
      [| 2 ; 4 ; 5 |];
      [| 7 ; 0 ; 1 |] |]
+
+let max_cheese cheese =
+  let height = Array.length cheese in 
+  let width = Array.length cheese.(0) in 
+  let memo = Array.make_matrix height width 0 in
+  
+  let rec poracunaj_celico (vr:int) (st:int) =
+    if st = - 1 then () else (
+    let desno = if st = width - 1 then 0 else memo.(vr).(st + 1) in
+    let dol = if vr = height - 1 then 0 else memo.(vr + 1).(st) in
+    memo.(vr).(st) <- cheese.(vr).(st) + (max desno dol));
+    poracunaj_celico vr (st - 1)
+    )
+  in
+  let rec vrsticno (vr:int) =      (*naj vrača kar nekaj - unit*)
+    if vr = -1 then ()             (*vrsticno samo laufa pravo stvar na vrs.*)
+    else (
+      poracunaj_celico vr (width - 1);
+      vrsticno (vr - 1)            (*skoči 1 vrstico višje*)
+    )
+  
+  in
+  vrsticno (height - 1);  (*podpičje, ker potem ignorira kar vrne - unit*)
+  memo.(0).(0)
+
+(*zahtevnost n*m oz. n^2; da dobimo pravo rešitev moramo pogledat vsaj vse;
+čez nobeno nismo šli večkrat*)
+
 
 (*----------------------------------------------------------------------------*]
  Rešujemo problem sestavljanja alternirajoče obarvanih stolpov. Imamo štiri
@@ -36,7 +66,17 @@ let test_matrix =
  # alternating_towers 10;;
  - : int = 35
 [*----------------------------------------------------------------------------*)
-
+let alternating_towers n =
+  let memo_modri = Array.make n 1 in
+  let memo_rdeči = Array.make n 1 in
+  let rec modri l =
+    if l > n then ()
+    else memo_modri.(l) <- memo_rdeči(l - 2) + memo_rdeči (l - 3) (*nedokončano*)
+    rdeci 0
+  and rdeci                   (* "and" damo, če hočemo vzajemno rekurzijo*) 
+    modri l
+  in
+  modri n + rdeci n
 
 (*----------------------------------------------------------------------------*]
  Na nagradni igri ste zadeli kupon, ki vam omogoča, da v Mercatorju kupite
